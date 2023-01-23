@@ -1,3 +1,5 @@
+github.com/ad-8/gobox v0.5.0 h1:DQY5x5p7FbM8POnPPe00GmYrvCvmAbNtI1x8CVSRMQk=
+github.com/ad-8/gobox v0.5.0/go.mod h1:0cyrGqUxLztInjZxiFftbISvrSBH+GDxfEXfNKjxkEk=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
