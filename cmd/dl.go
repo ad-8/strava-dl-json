@@ -22,9 +22,13 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-
+	"github.com/ad-8/gobox/io"
+	"github.com/ad-8/strava-dl-json/dl"
 	"github.com/spf13/cobra"
+	"log"
+	"time"
 )
 
 // dlCmd represents the dl command
@@ -38,8 +42,40 @@ var dlCmd = &cobra.Command{
 	//This application is a tool to generate the needed files
 	//to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("dl called")
+		downloadAndSave()
 	},
+}
+
+// downloadAndSave downloads all Strava activities of a user
+// and exports them to a JSON file.
+func downloadAndSave() {
+	start := time.Now()
+
+	clientID, clientSecret, refreshToken := loadDotEnv()
+	tokenInfo, _ := dl.NewTokenInfo(clientID, clientSecret, refreshToken)
+	tokenInfo.Print()
+
+	allActivities, err := dl.AllActivities(*tokenInfo)
+	if err != nil {
+		return
+	}
+	fmt.Printf("\ndownloaded %d activities in %v\n", len(allActivities), time.Since(start))
+
+	dataJSON, err := json.MarshalIndent(allActivities, "", "    ")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = checkDataDirExists()
+	if err != nil {
+		log.Fatal(err)
+	}
+	filepath, _ := prefixDataDir(jsonFile)
+
+	if err := io.SimpleWrite(filepath, dataJSON); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("sucessfully written to file %q\n", filepath)
 }
 
 func init() {
