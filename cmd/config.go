@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-// All paths set here must be relative to $HOME
+// All paths set here must be relative to $HOME,
 // e.g. if the JSON file with the activities should be saved in /Users/alex/strava-data
 // then set appDataDir = "strava-data".
 //
@@ -21,11 +21,11 @@ const ( // TODO load via .env file (or use toml for everything)
 	jsonFile   = "current.json"
 )
 
-// loadDotEnv reads the values that are required to generate a Strava token from a .env file.
+// loadDotEnv reads the values that are required to generate a Strava token from an .env file.
 func loadDotEnv() (clientID, clientSecret, refreshToken string) {
 	dotEnvPath, err := prefixDataDir(dotEnvFile)
 	if err != nil {
-		log.Fatalf("error getting path of .env file: %v", err)
+		log.Fatalf("error creating path of .env file: %v", err)
 	}
 	err = godotenv.Load(dotEnvPath)
 	if err != nil {
@@ -46,7 +46,7 @@ func loadDotEnv() (clientID, clientSecret, refreshToken string) {
 	return
 }
 
-// checkDataDirExists makes sure that the apps data dir exists.
+// checkDataDirExists makes sure that the apps data dir exists, creating it if necessary.
 func checkDataDirExists() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -58,7 +58,8 @@ func checkDataDirExists() error {
 	return nil
 }
 
-// prefixDataDir returns the abspath for the file in the app data dir.
+// prefixDataDir prefixes a file with the content of $HOME (e.g. /Users/alex)
+// and the value set for appDataDir and returns a valid path if successful.
 func prefixDataDir(file string) (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {

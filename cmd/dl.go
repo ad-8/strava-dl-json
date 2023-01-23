@@ -43,19 +43,22 @@ var dlCmd = &cobra.Command{
 // downloadAndSave downloads all Strava activities of a user
 // and exports them to a JSON file.
 func downloadAndSave() {
-	start := time.Now()
-
 	clientID, clientSecret, refreshToken := loadDotEnv()
-	tokenInfo, _ := dl.NewTokenInfo(clientID, clientSecret, refreshToken)
+	tokenInfo, err := dl.NewTokenInfo(clientID, clientSecret, refreshToken)
+	if err != nil {
+		log.Fatal(err)
+	}
 	tokenInfo.Print()
 
+	start := time.Now()
 	allActivities, err := dl.AllActivities(*tokenInfo)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
-	fmt.Printf("\ndownloaded %d activities in %v\n", len(allActivities), time.Since(start))
+	fmt.Printf("downloaded %d activities in %v\n", len(allActivities), time.Since(start))
 
-	dataJSON, err := json.MarshalIndent(allActivities, "", "    ")
+	const fourSpaces = "    "
+	dataJSON, err := json.MarshalIndent(allActivities, "", fourSpaces)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +67,10 @@ func downloadAndSave() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	filepath, _ := prefixDataDir(jsonFile)
+	filepath, err := prefixDataDir(jsonFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if err := io.SimpleWrite(filepath, dataJSON); err != nil {
 		log.Fatal(err)

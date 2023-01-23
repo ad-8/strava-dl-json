@@ -16,10 +16,10 @@ import (
 )
 
 const (
-	stravaOAuth                 = "https://www.strava.com/oauth/token"
-	stravaActivitiesEndpoint    = "https://www.strava.com/api/v3/athlete/activities"
-	maxActivitiesAllowedPerPage = 200 // 200 activities per page is a Strava limit
-	currentlyFullPages          = 9   // TODO improve logic (e.g. store in file and update dynamically)
+	stravaOAuth              = "https://www.strava.com/oauth/token"
+	stravaActivitiesEndpoint = "https://www.strava.com/api/v3/athlete/activities"
+	activitiesPerPage        = 200 // 200 activities per page is a Strava limit
+	currentlyFullPages       = 10  // TODO improve logic (e.g. store in file and update dynamically)
 )
 
 // TokenInfo represents the response that contains information about the Strava access token.
@@ -47,7 +47,8 @@ func (t *TokenInfo) ParseTime() {
 
 // Print prints when the token will expire.
 func (t *TokenInfo) Print() {
-	fmt.Printf("the token expires in %02d:%02d:%02d (will be automatically refreshed)\n\n", t.ExpiresHours, t.ExpiresMin, t.ExpiresSec)
+	fmt.Printf("the token expires in %02d:%02d:%02d (will be automatically refreshed)\n\n",
+		t.ExpiresHours, t.ExpiresMin, t.ExpiresSec)
 }
 
 // NewTokenInfo gets information about the access token - because the access token expires every 6 hours - and returns
@@ -62,7 +63,7 @@ func NewTokenInfo(clientId, clientSecret, refreshToken string) (*TokenInfo, erro
 
 	body, statusCode, err := net.MakePOSTRequest(stravaOAuth, params)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("NewTokenInfo: error making request: %w", err)
 	}
 
 	tokenInfo := new(TokenInfo)
@@ -109,7 +110,7 @@ func AllActivities(info TokenInfo) ([]model.StravaActivity, error) {
 	var wg sync.WaitGroup
 	for pageNum := 1; ; pageNum++ {
 		// TODO improve logic (maybe use channels)
-		// without time.Sleep there will be >2.9k goroutines making requests before stop is set to true
+		// without time.Sleep there will be ~3k goroutines making requests before stop is set to true
 		if pageNum > currentlyFullPages {
 			time.Sleep(250 * time.Millisecond)
 		}
@@ -127,7 +128,10 @@ func AllActivities(info TokenInfo) ([]model.StravaActivity, error) {
 // getPage queries the Strava API for all activities on the specified page.
 func getPage(accessToken string, pageNum int, m *model.SafeMap, wg *sync.WaitGroup, stop *StopFlag) {
 	var activitiesOnPage []model.StravaActivity
-	body, _ := requestActivitiesFromPage(accessToken, pageNum)
+	body, err := requestActivitiesFromPage(accessToken, pageNum)
+	if err != nil {
+		log.Fatalf("getPage: %v", err)
+	}
 
 	if string(body) == "[]" {
 		stop.true()
@@ -159,7 +163,7 @@ func requestActivitiesFromPage(accessToken string, pageNum int) ([]byte, error) 
 	}
 	q := req.URL.Query()
 	q.Add("page", strconv.Itoa(pageNum))
-	q.Add("per_page", strconv.Itoa(maxActivitiesAllowedPerPage))
+	q.Add("per_page", strconv.Itoa(activitiesPerPage))
 	req.URL.RawQuery = q.Encode()
 
 	resp, _, err := net.MakeGETRequest(req)
