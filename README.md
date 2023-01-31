@@ -28,9 +28,11 @@ head current.json
   // ...
 ]
 ```
-Or simply open `current.json` with `Firefox`, which has a good JSON viewer built-in.
+Or simply open `current.json` with `Firefox`, which has a pretty good JSON viewer built-in.
 
-# Initial Setup
+# Initial Setup  
+
+The following steps are a **onetime** process.
 
 To proceed, `git` and the `Go` programming language must be installed on your system.
 
@@ -48,18 +50,18 @@ Add this folder to your `$PATH` so you can later on simply type `strava-dl-json`
 (otherwise you would have to type `$HOME/go/bin/strava-dl-json` each time).
 
 ### 2) Get Strava Authorization Codes
-This step is the hardest, or at least the most time-consuming one.
+Strava describes how to do this here: [developers.strava.com](https://developers.strava.com/docs/getting-started/).
 
-Strava describes how to do this [here](https://developers.strava.com/docs/getting-started/).
-
-You will need the obtain the following three codes in order to set up `strava-dl-json` successfully:
+You will need to obtain the following three codes in order to set up `strava-dl-json` successfully:
 - Client ID
 - Client Secret
 - Refresh Token
 
-### 3) Create a download folder
-This is the folder where the JSON file will be stored.
+Please note that the Refresh Token needed is *not* the Request Token found under [https://www.strava.com/settings/api](https://www.strava.com/settings/api),
+but the one which will be generated in process described on [developers.strava.com](https://developers.strava.com/docs/getting-started/).
+This is because the Refresh Token must have *read_all* scope.
 
+### 3) Create a download folder where the exported JSON file will be stored
 Currently, the default name for the download folder is `strava-data`,
 which must be located in your `$HOME` directory, e.g. `/Users/alex/strava-data`.
 
@@ -88,7 +90,6 @@ Make sure to replace `123`, `"foo"` and `"bar"` with the actual codes created in
 
 
 ### 5) Run `strava-dl-json`
-In a terminal, run this command:
 ```sh
 strava-dl-json dl
 ```
