@@ -52,6 +52,11 @@ Add this folder to your `$PATH` so you can later on simply type `strava-dl-json`
 ### 2) Get Strava Authorization Codes
 Strava describes how to do this here: [developers.strava.com](https://developers.strava.com/docs/getting-started/).
 
+The *Getting your data* section of this 
+[blog post](https://towardsdatascience.com/using-the-strava-api-and-pandas-to-explore-your-activity-data-d94901d9bfde)
+describes the process in other words, which might be helpful.
+
+
 You will need to obtain the following three codes in order to set up `strava-dl-json` successfully:
 - Client ID
 - Client Secret
